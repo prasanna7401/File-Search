@@ -1,0 +1,591 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2022.12.08 00:49:31 =~=~=~=~=~=~=~=~=~=~=~=
+show con
+                                ^
+'con' is ambiguous.
+Possible completions:
+  configuration        Show current configuration
+  connections          Show circuit cross-connect connections
+{master:0}
+tcsadmin@EUESV-SWJ-DMZ> show con   figuration 
+## Last commit: 2022-01-26 10:24:28 CET by root
+version 12.3R12.4;
+system {
+    host-name EUESV-SWJ-DMZ;
+    domain-name corpdsb.com;
+    time-zone Europe/Madrid;
+    name-server {
+        10.217.10.41;
+        10.217.10.42;
+    }
+    radius-options {
+        password-protocol mschap-v2;
+    }
+    services {
+        ssh;
+        web-management {
+            http;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    ntp {
+        server 10.25.220.20;
+        server 10.25.220.2;
+        server 10.25.220.201;
+        server 10.217.11.36 prefer;
+        server 10.217.11.37;
+    }
+}
+chassis {
+    aggregated-devices {
+        ethernet {
+            device-count 3;
+        }
+    }
+    alarm {
+        management-ethernet {
+            link-down ignore;
+---(more)---                                                }
+    }
+}
+interfaces {
+    interface-range unused-interfaces {
+        member-range ge-0/0/5 to ge-0/0/20;
+    }
+    ge-0/0/0 {
+        description "Valencia L3 Internet Connection to ISP";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/1 {
+        description "Cisco 4301 DMVPN Backup Router cr-esvlc-01";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/2 {
+        description "Juniper SRX240 Node 0 - Untrust";
+        disable;
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/3 {
+        description "Juniper SRX240 Node 1 - Untrust";
+        disable;
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+---(more)---                                                            members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/4 {
+        description "OpenGear Uplink";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/5 {
+        description "Virgin Media Internet";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/6 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/7 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/8 {
+---(more 24%)---                                                unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/9 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/10 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/11 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/12 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+---(more 33%)---                                            }
+    ge-0/0/13 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/14 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/15 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/16 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/17 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+---(more 41%)---                                                    }
+        }
+    }
+    ge-0/0/18 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/19 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/20 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members untrust;
+                }
+            }
+        }
+    }
+    ge-0/0/21 {
+        description UP_Link_To_Core;
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+            }
+        }
+    }
+    ge-0/0/22 {
+        ether-options {
+            speed {
+                1g;
+---(more 49%)---                                                    }
+            802.3ad ae0;
+        }
+    }
+    ge-0/0/23 {
+        ether-options {
+            speed {
+                1g;
+            }
+            802.3ad ae0;
+        }
+    }
+    ge-0/1/0 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/1 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/2 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/3 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ae0 {
+        description "Aggregated 802.3ad Interface to Core";
+        disable;
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members default;
+                }
+---(more 58%)---                                                    }
+        }
+    }
+    vlan {
+        unit 0 {
+            family inet {
+                address 10.25.254.171/24;
+            }
+        }
+        unit 2 {
+            family inet;
+        }
+        unit 3 {
+            family inet;
+        }
+        unit 4 {
+            family inet;
+        }
+        unit 5 {
+            family inet;
+        }
+        unit 6 {
+            family inet;
+        }
+        unit 7 {
+            family inet;
+        }
+        unit 8 {
+            family inet;
+        }
+        unit 9 {
+            family inet;
+        }
+        unit 11 {
+            family inet;
+        }
+        unit 12 {
+            family inet;
+        }
+        unit 16 {
+            family inet;
+        }
+        unit 30 {
+            family inet;
+        }
+        unit 40 {
+            family inet;
+        }
+---(more 66%)---                                                unit 55 {
+            family inet;
+        }
+        unit 100 {
+            family inet;
+        }
+        unit 102 {
+            family inet;
+        }
+        unit 104 {
+            family inet;
+        }
+        unit 105 {
+            family inet;
+        }
+        unit 106 {
+            family inet;
+        }
+        unit 160 {
+            family inet;
+        }
+        unit 200 {
+            family inet;
+        }
+        unit 201 {
+            family inet;
+        }
+        unit 202 {
+            family inet;
+        }
+        unit 204 {
+            family inet;
+        }
+        unit 220 {
+            family inet;
+        }
+        unit 221 {
+            family inet;
+        }
+        unit 230 {
+            family inet;
+        }
+        unit 800 {
+            family inet;
+        }
+        unit 2541 {
+            family inet;
+        }
+---(more 74%)---                                            }
+}
+snmp {
+    name EUESV-SWJ-DMZ;
+    location EUESV;
+    contact "MG-ZBS-INDIA-Networks@zimmerbiomet.com";
+    community d1am0nd;
+    community "bm3tr3@d";
+    community read;
+    community "P!nwh@@L" {
+        authorization read-only;
+        clients {
+            0.0.0.0/0 restrict;
+            10.217.9.14/32;
+        }
+    }
+}
+routing-options {
+    graceful-restart;
+    static {
+        route 0.0.0.0/0 next-hop 10.25.254.254;
+    }
+}
+protocols {
+    igmp-snooping {
+        vlan all;
+    }
+    rstp;
+    lldp {
+        interface all;
+    }
+    lldp-med {
+        interface all;
+    }
+}
+ethernet-switching-options {
+    storm-control {
+        interface all;
+    }
+}
+vlans {
+    EUESV-CLOSET11 {
+        description "Closet 11";
+        vlan-id 11;
+    }
+    EUESV-CLOSET12 {
+        description "Closet 12";
+        vlan-id 12;
+---(more 82%)---                                            }
+    EUESV-CLOSET2 {
+        description Closet2;
+        vlan-id 2;
+    }
+    EUESV-CLOSET3 {
+        description Closet3;
+        vlan-id 3;
+    }
+    EUESV-CLOSET4 {
+        description Closet4;
+        vlan-id 4;
+    }
+    EUESV-CLOSET5 {
+        description Closet5;
+        vlan-id 5;
+    }
+    EUESV-CLOSET6 {
+        description Closet6;
+        vlan-id 6;
+    }
+    EUESV-CLOSET7 {
+        description Closet7;
+        vlan-id 7;
+    }
+    EUESV-CLOSET8 {
+        description Closet8;
+        vlan-id 8;
+    }
+    EUESV-CLOSET9 {
+        description Closet9;
+        vlan-id 9;
+    }
+    EUESV-DRAC {
+        description DRAC;
+        vlan-id 230;
+    }
+    EUESV-EUR-PC {
+        vlan-id 30;
+    }
+    EUESV-EUR-SERVERS {
+        vlan-id 221;
+    }
+    EUESV-NoInternet202 {
+        description "No Internet 202";
+        vlan-id 202;
+    }
+    EUESV-SERVERS {
+---(more 91%)---                                                description Servers;
+        vlan-id 220;
+    }
+    att {
+        vlan-id 1011;
+    }
+    default {
+        l3-interface vlan.0;
+    }
+    firewall {
+        description "Firewall Uplink";
+        vlan-id 244;
+    }
+    mgmt;
+    router {
+        description "COLT MPLS uplink";
+        vlan-id 241;
+    }
+    untrust {
+        description "L2 vlan for firewall reth0 connection to the Colt Internet router";
+        vlan-id 245;
+    }
+    vlan100 {
+        description "Wifi Office Users";
+        vlan-id 100;
+    }
+    vlan102 {
+        description "Valencia WiFi - Shop Floor";
+        vlan-id 102;
+    }
+    vlan104 {
+        description "Valencia WiFi - Scanners";
+        vlan-id 104;
+    }
+    vlan105 {
+        description "Valencia Guest Wireless";
+        vlan-id 105;
+    }
+    vlan106 {
+        description "Valencia WiFi - Aruba Controllers";
+        vlan-id 106;
+    }
+    vlan55 {
+        description "Tactica Warehouse via WiMax";
+        vlan-id 55;
+    }
+    vlan800 {
+        description "Valencia Router vlan 800";
+---(more 99%)---                                                l3-interface vlan.800;
+    }
+}
+
+{master:0}
+tcsadmin@EUESV-SWJ-DMZ> 

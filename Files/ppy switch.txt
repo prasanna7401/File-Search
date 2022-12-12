@@ -1,0 +1,1419 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2022.12.08 00:41:41 =~=~=~=~=~=~=~=~=~=~=~=
+show run
+                          ^
+syntax error, expecting <command>.
+newco@USPAR-SWJ-P01> show run            configuration 
+## Last commit: 2022-11-13 08:55:23 EST by tcsadmin
+version 12.3R6.6;
+/*
+ * $Id$
+ *
+ * ex4200-defaults.conf  - Default configurations for EX4200 
+ *
+ * Copyright (c) 2010, Juniper Networks, Inc.
+ * All rights reserved.
+ */
+groups {
+    ezqos-voip {
+        class-of-service {
+            classifiers {
+                dscp ezqos-dscp-classifier {
+                    import default;
+                    forwarding-class ezqos-voice-fc {
+                        loss-priority low code-points 101110;
+                    }
+                    forwarding-class ezqos-control-fc {
+                        loss-priority low code-points [ 110000 011000 011010 111000 ];
+                    }
+                    forwarding-class ezqos-video-fc {
+---(more)---                                                                loss-priority low code-points 100010;
+                    }
+                }
+            }
+            forwarding-classes {
+                class ezqos-best-effort queue-num 0;
+                class ezqos-video-fc queue-num 4;
+                class ezqos-voice-fc queue-num 5;
+                class ezqos-control-fc queue-num 7;
+            }
+            scheduler-maps {
+                ezqos-voip-sched-maps {
+                    forwarding-class ezqos-voice-fc scheduler ezqos-voice-scheduler;
+                    forwarding-class ezqos-control-fc scheduler ezqos-control-scheduler;
+                    forwarding-class ezqos-video-fc scheduler ezqos-video-scheduler;
+                    forwarding-class ezqos-best-effort scheduler ezqos-data-scheduler;
+                }
+            }
+            schedulers {
+                ezqos-voice-scheduler {
+                    buffer-size percent 20;
+                    priority strict-high;
+                }
+---(more 3%)---                                                        ezqos-control-scheduler {
+                    buffer-size percent 10;
+                    priority strict-high;
+                }
+                ezqos-video-scheduler {
+                    transmit-rate percent 70;
+                    buffer-size percent 20;
+                    priority low;
+                }
+                ezqos-data-scheduler {
+                    transmit-rate percent 30;
+                    buffer-size percent 50;
+                    priority low;
+                }
+            }
+        }
+    }
+}
+apply-groups ezqos-voip;
+system {
+    host-name USPAR-SWJ-P01;
+    domain-name biomet.local;
+    time-zone America/New_York;
+---(more 4%)---                                            authentication-order [ password radius ];
+    root-authentication {
+        encrypted-password "$1$hNwoLMY6$Mx//wOWF.K91BIBRRfwo7/"; ## SECRET-DATA
+    }
+    name-server {
+        10.18.220.3;
+        10.19.220.4;
+    }
+    radius-server {
+        10.19.93.1 {
+            secret "$9$/F2iAO1hcleKWuOxdVbg4mfT"; ## SECRET-DATA
+            source-address 10.18.254.254;
+        }
+    }
+    login {
+---(more 5%)---                                                announcement "\n\n[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]\n[]                                                                          []\n[]                                WARNING                                   []\n[]                                                                          []\n[]                                                                          []\n[]   This system is the property of Biomet Inc.                             []\n[]                                                                          []\n[]   Unauthorized access prohibited                                         []\n[]   Disconnect IMMEDIATELY if you are not an authorized employee!          []\n[]   Contact (574) 372-1585 for help.                                       []\n[]                                                                          []\n[]                                                                          []\n[]   Unauthorized or improper use of this system may result in              []\n[]   administrative disciplinary action and civil and criminal penalties.   []\n[]                                                                          []\n[]                                                                          []\n[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]\n\n\n";
+        class support {
+            permissions [ configure interface interface-control view view-configuration ];
+        }
+        user newco {
+            uid 2004;
+            class super-user;
+            authentication {
+                encrypted-password "$1$G5gndp7P$iYNyYkMKlXZkBkLznsVXP0"; ## SECRET-DATA
+            }
+        }
+        user readonly {
+            uid 2000;
+            class read-only;
+---(more 6%)---                                                }
+        user readwrite {
+            uid 2001;
+            class super-user;
+        }
+        user support {
+            uid 2002;
+            class support;
+        }
+        user tcsadmin {
+            uid 2003;
+            class super-user;
+            authentication {
+                encrypted-password "$1$E.9LGK7b$p8auROeT0eimannq37cAu/"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh;
+        telnet;
+        netconf {
+            ssh;
+        }
+---(more 8%)---                                                web-management {
+            http;
+        }
+        dhcp {
+            pool 10.18.93.0/24 {
+                address-range low 10.18.93.40 high 10.18.93.60;
+                default-lease-time 3600;
+                domain-name biomet.local;
+                name-server {
+                    10.12.220.3;
+                }
+                router {
+                    10.18.93.254;
+                }
+            }
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+---(more 10%)---                                                    authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+        file default-log-messages {
+            any any;
+            match "(requested 'commit' operation)|(copying configuration to juniper.save)|(commit complete)|ifAdminStatus|(FRU power)|(FRU removal)|(FRU insertion)|(link UP)|transitioned|Transferred|transfer-file|(license add)|(license delete)|(package -X update)|(package -X delete) | (vc add)|(vc delete)| cm_device";
+            structured-data;
+        }
+    }
+    commit synchronize;
+    ntp {
+        server 10.217.11.37;
+    }
+}
+chassis {
+    redundancy {
+        graceful-switchover;
+    }
+    aggregated-devices {
+---(more 11%)---                                                ethernet {
+            device-count 40;
+        }
+    }
+    alarm {
+        management-ethernet {
+            link-down ignore;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/1 {
+        unit 0 {
+---(more 13%)---                                                    family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/2 {
+        description "Connected to Access point";
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-A02 USPAR-Guest ];
+                }
+                native-vlan-id USPAR-Aruba;
+            }
+        }
+    }
+    ge-0/0/3 {
+        description "Connected to Access point";
+        unit 0 {
+---(more 14%)---                                                    family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-A02 USPAR-Guest ];
+                }
+                native-vlan-id USPAR-Aruba;
+            }
+        }
+    }
+    ge-0/0/4 {
+        description "Connected to Access point";
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-A02 USPAR-Guest ];
+                }
+                native-vlan-id USPAR-Aruba;
+            }
+        }
+    }
+    ge-0/0/5 {
+        description "Connected to Access point";
+---(more 16%)---                                                unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-A02 USPAR-Guest ];
+                }
+                native-vlan-id USPAR-Aruba;
+            }
+        }
+    }
+    ge-0/0/6 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/7 {
+        unit 0 {
+            family ethernet-switching {
+---(more 18%)---                                                        port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/8 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/9 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+---(more 19%)---                                                        }
+            }
+        }
+    }
+    ge-0/0/10 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/11 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+---(more 21%)---                                            }
+    ge-0/0/12 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/13 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/14 {
+        unit 0 {
+---(more 23%)---                                                    family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/15 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/16 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+---(more 24%)---                                                            members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/17 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/18 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+---(more 26%)---                                                }
+    }
+    ge-0/0/19 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/20 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/21 {
+---(more 27%)---                                                description "USPAR-SCCM-P01 10.18.220.6";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-0/0/22 {
+        description "USPAR-WCA-P01 10.18.93.251";
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-bmt-mobile USPAR-bmt-wifi USPAR-Guest USPAR-bmt-shpflr USPAR-bmt-hndscn USPAR-A02 ];
+                }
+                native-vlan-id 93;
+            }
+        }
+    }
+    ge-0/0/23 {
+---(more 29%)---                                                unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/0 {
+        ether-options {
+            802.3ad ae11;
+        }
+    }
+    xe-0/1/0 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/1 {
+        ether-options {
+            802.3ad ae12;
+        }
+    }
+    xe-0/1/1 {
+        unit 0 {
+            family ethernet-switching;
+        }
+---(more 31%)---                                            }
+    ge-0/1/2 {
+        ether-options {
+            802.3ad ae13;
+        }
+    }
+    xe-0/1/2 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-0/1/3 {
+        ether-options {
+            802.3ad ae14;
+        }
+    }
+    ge-1/0/0 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    ge-1/0/1 {
+        unit 0 {
+---(more 32%)---                                                    family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/2 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/3 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+---(more 34%)---                                                            members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/4 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/5 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+---(more 36%)---                                                }
+    }
+    ge-1/0/6 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-Printer-Management;
+                }
+            }
+        }
+    }
+    ge-1/0/7 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-Printer-Management;
+                }
+            }
+        }
+    }
+    ge-1/0/8 {
+---(more 37%)---                                                description "Avaya IPSI";
+        ether-options {
+            no-auto-negotiation;
+            link-mode full-duplex;
+            speed {
+                100m;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-Avaya-Infrastructure-Network;
+                }
+            }
+        }
+    }
+    ge-1/0/9 {
+        description "connected to cr-usppy-01.corpdsb.com";
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+---(more 39%)---                                                            members MGMT;
+                }
+            }
+        }
+    }
+    ge-1/0/10 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-PXE;
+                }
+            }
+        }
+    }
+    ge-1/0/11 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+---(more 41%)---                                                }
+    }
+    ge-1/0/12 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/13 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/14 {
+---(more 42%)---                                                unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/15 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/16 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+---(more 44%)---                                                        vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/17 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/18 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+---(more 45%)---                                                    }
+        }
+    }
+    ge-1/0/19 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/20 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+---(more 47%)---                                            ge-1/0/21 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/0/22 {
+        description "USPAR-WCA-P02 10.18.93.252";
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members [ USPAR-bmt-mobile USPAR-bmt-wifi USPAR-Guest USPAR-bmt-shpflr USPAR-bmt-hndscn USPAR-A02 ];
+                }
+                native-vlan-id 93;
+            }
+        }
+    }
+    ge-1/0/23 {
+---(more 49%)---                                                description "USPAR-FWJ-P01 Firewall";
+        unit 0 {
+            family ethernet-switching {
+                vlan {
+                    members USPAR-A01;
+                }
+            }
+        }
+    }
+    ge-1/1/0 {
+        ether-options {
+            802.3ad ae15;
+        }
+    }
+    ge-1/1/1 {
+        ether-options {
+            802.3ad ae16;
+        }
+    }
+    ge-1/1/2 {
+        ether-options {
+            802.3ad ae17;
+        }
+---(more 50%)---                                            }
+    ge-2/0/0 {
+        ether-options {
+            802.3ad ae11;
+        }
+    }
+    ge-2/0/1 {
+        ether-options {
+            802.3ad ae12;
+        }
+    }
+    ge-2/0/2 {
+        ether-options {
+            802.3ad ae13;
+        }
+    }
+    ge-2/0/3 {
+        ether-options {
+            802.3ad ae14;
+        }
+    }
+    ge-2/0/4 {
+        ether-options {
+---(more 52%)---                                                    802.3ad ae15;
+        }
+    }
+    ge-2/0/5 {
+        ether-options {
+            802.3ad ae16;
+        }
+    }
+    ge-2/0/6 {
+        ether-options {
+            802.3ad ae17;
+        }
+    }
+    ae11 {
+        description "USPAR-SWJ-P11 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+---(more 54%)---                                                    family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    ae12 {
+        description "USPAR-SWJ-P12 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+---(more 55%)---                                                        }
+            }
+        }
+    }
+    ae13 {
+        description "USPAR-SWJ-P13 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+---(more 57%)---                                            ae14 {
+        description "USPAR-SWJ-P14 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    ae15 {
+        description "USPAR-SWJ-P15 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+---(more 58%)---                                                    link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    ae16 {
+        description "TO USPAR-SWJ-P16 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+---(more 60%)---                                                    }
+        }
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    ae17 {
+        description "TO USPAR-SWJ-P17 AE0";
+        aggregated-ether-options {
+            minimum-links 1;
+            link-speed 1g;
+            lacp {
+                active;
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+---(more 62%)---                                                        port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.18.0.254/32;
+            }
+        }
+    }
+    me0 {
+        unit 0 {
+            family inet {
+                address 192.168.1.100/24;
+            }
+        }
+    }
+    vlan {
+        unit 0 {
+---(more 63%)---                                                    family inet;
+        }
+        unit 4 {
+            family inet {
+                address 10.18.4.12/28 {
+                    vrrp-group 4 {
+                        virtual-address 10.18.4.14;
+                        priority 254;
+                        preempt {
+                            hold-time 60;
+                        }
+                        accept-data;
+                    }
+                }
+            }
+        }
+        unit 11 {
+            family inet {
+                address 10.18.11.254/24;
+            }
+        }
+        unit 12 {
+            family inet {
+---(more 65%)---                                                        address 10.18.12.254/24;
+            }
+        }
+        unit 13 {
+            family inet {
+                address 10.18.13.254/24;
+            }
+        }
+        unit 14 {
+            family inet {
+                address 10.18.14.254/24;
+            }
+        }
+        unit 15 {
+            family inet {
+                address 10.18.15.254/24;
+            }
+        }
+        unit 16 {
+            family inet {
+                address 10.18.16.254/24;
+            }
+        }
+---(more 67%)---                                                unit 17 {
+            family inet {
+                address 10.18.17.254/24;
+            }
+        }
+        unit 56 {
+            family inet {
+                address 10.18.59.254/22;
+            }
+        }
+        unit 72 {
+            family inet {
+                address 10.18.79.254/21;
+            }
+        }
+        unit 90 {
+            family inet {
+                address 10.18.90.254/24;
+            }
+        }
+        unit 93 {
+            family inet {
+                address 10.18.93.254/24;
+---(more 68%)---                                                    }
+        }
+        unit 105 {
+            family inet {
+                address 192.168.105.254/24;
+            }
+        }
+        unit 111 {
+            family inet {
+                address 10.18.1.12/28 {
+                    vrrp-group 111 {
+                        virtual-address 10.18.1.14;
+                        priority 254;
+                        preempt {
+                            hold-time 60;
+                        }
+                        accept-data;
+                    }
+                }
+            }
+        }
+        unit 160 {
+            family inet {
+---(more 70%)---                                                        address 10.18.161.254/23;
+            }
+        }
+        unit 170 {
+            family inet {
+                address 10.18.170.254/24;
+            }
+        }
+        unit 195 {
+            family inet {
+                address 10.18.195.254/24;
+            }
+        }
+        unit 211 {
+            family inet {
+                address 10.18.211.254/24;
+            }
+        }
+        unit 212 {
+            family inet {
+                address 10.18.215.254/22;
+            }
+        }
+---(more 72%)---                                                unit 216 {
+            family inet {
+                address 10.18.219.254/22;
+            }
+        }
+        unit 220 {
+            family inet {
+                address 10.18.220.254/24;
+            }
+        }
+        unit 240 {
+            family inet {
+                address 10.18.240.254/24;
+            }
+        }
+        unit 254 {
+            family inet {
+                address 10.18.254.254/24;
+            }
+        }
+        unit 800 {
+            family inet {
+                address 10.210.240.225/29;
+---(more 73%)---                                                    }
+        }
+    }
+}
+snmp {
+    location Gatehall;
+    community "bm3tr3@d" {
+        authorization read-only;
+        clients {
+            0.0.0.0/0 restrict;
+            10.217.9.14/32;
+        }
+    }
+    trap-group space {
+        version v2;
+        targets {
+            10.19.254.130;
+        }
+    }
+}
+forwarding-options {
+    helpers {
+        bootp {
+---(more 75%)---                                                    interface {
+                vlan.12 {
+                    server 10.210.240.226;
+                }
+                vlan.13 {
+                    server 10.18.220.3;
+                }
+                vlan.14 {
+                    server 10.18.220.3;
+                }
+                vlan.15 {
+                    server 10.18.220.3;
+                }
+                vlan.160 {
+                    server 10.18.220.3;
+                }
+                vlan.90 {
+                    server 10.18.90.5;
+                }
+                vlan.212 {
+                    server 10.18.220.3;
+                }
+                vlan.16 {
+---(more 76%)---                                                            server 10.18.220.3;
+                }
+                vlan.17 {
+                    server 10.18.220.3;
+                }
+                vlan.211 {
+                    server 10.18.220.3;
+                }
+                vlan.72 {
+                    server 10.18.220.3;
+                }
+                vlan.216 {
+                    server 10.18.220.3;
+                }
+                vlan.11 {
+                    server 10.210.240.226;
+                }
+                vlan.105 {
+                    server 10.210.240.226;
+                }
+            }
+        }
+    }
+---(more 78%)---                                        }
+routing-options {
+    nonstop-routing;
+    static {
+        route 203.132.221.0/24 next-hop 10.18.254.252;
+        route 0.0.0.0/0 next-hop 10.210.240.226;
+    }
+    aggregate {
+        route 10.18.0.0/16 {
+            preference 254;
+            discard;
+        }
+    }
+    router-id 10.18.0.254;
+    autonomous-system 65018;
+}
+protocols {
+    ##
+    ## Warning: requires 'bgp' license
+    ##
+    bgp {
+        graceful-restart;
+        group ibgp-peers {
+---(more 80%)---                                                    type internal;
+            import Ibgp-in;
+            export Ibgp-ex;
+            neighbor 10.18.4.4;
+        }
+        group ebgp-peers {
+            type external;
+            import Ebgp-in;
+            export Ebgp-ex;
+            peer-as 64718;
+            local-as 65018;
+            neighbor 10.18.1.1;
+        }
+    }
+    igmp-snooping {
+        vlan all;
+    }
+    rstp;
+    lldp {
+        interface all;
+    }
+    lldp-med {
+        interface all;
+---(more 81%)---                                            }
+}
+policy-options {
+    policy-statement Ebgp-ex {
+        term 010 {
+            from {
+                protocol aggregate;
+                route-filter 10.18.0.0/16 exact;
+            }
+            then {
+                next-hop self;
+                accept;
+            }
+        }
+        term 999 {
+            then reject;
+        }
+    }
+    policy-statement Ebgp-in {
+        term 005 {
+            from {
+                route-filter 10.18.0.0/16 upto /31;
+            }
+---(more 83%)---                                                    then reject;
+        }
+        term 010 {
+            from {
+                protocol bgp;
+                route-filter 10.0.0.0/8 upto /31;
+            }
+            then {
+                preference 25;
+                accept;
+            }
+        }
+        term 999 {
+            then reject;
+        }
+    }
+    policy-statement Ibgp-ex {
+        term 010 {
+            from {
+                protocol aggregate;
+                route-filter 10.18.0.0/16 exact;
+            }
+            then {
+---(more 85%)---                                                        next-hop self;
+                accept;
+            }
+        }
+        term 011 {
+            from protocol bgp;
+            then accept;
+        }
+        term 999 {
+            then reject;
+        }
+    }
+    policy-statement Ibgp-in {
+        term 010 {
+            from {
+                protocol bgp;
+                route-filter 10.0.0.0/8 orlonger;
+            }
+            then {
+                preference 250;
+                accept;
+            }
+        }
+---(more 86%)---                                                term 999 {
+            then reject;
+        }
+    }
+}
+class-of-service {
+    interfaces {
+        ge-0/0/0 {
+            scheduler-map ezqos-voip-sched-maps;
+            unit 0 {
+                classifiers {
+                    dscp ezqos-dscp-classifier;
+                }
+            }
+        }
+        ge-0/0/23 {
+            scheduler-map ezqos-voip-sched-maps;
+            unit 0 {
+                classifiers {
+                    dscp ezqos-dscp-classifier;
+                }
+            }
+        }
+---(more 88%)---                                            }
+}
+firewall {
+    family ethernet-switching {
+        filter invalid-dhcp {
+            term 1 {
+                then {
+                    discard;
+                    count discard-invalid-dhcp;
+                }
+            }
+            term 2 {
+                then accept;
+            }
+        }
+    }
+}
+ethernet-switching-options {
+    voip;
+    storm-control {
+        interface all;
+    }
+}
+---(more 89%)---                                        vlans {
+    MGMT {
+        vlan-id 800;
+        l3-interface vlan.800;
+    }
+    USPAR-A01 {
+        description "Users 10.18.11.x/24";
+        vlan-id 11;
+        l3-interface vlan.11;
+    }
+    USPAR-A02 {
+        description "Users 10.18.12.x/24";
+        vlan-id 12;
+        l3-interface vlan.12;
+    }
+    USPAR-A03 {
+        description "Users - 10.18.13.x/24";
+        vlan-id 13;
+        l3-interface vlan.13;
+    }
+    USPAR-A04 {
+        description "Users - 10.18.14.x/24";
+        vlan-id 14;
+---(more 91%)---                                                l3-interface vlan.14;
+    }
+    USPAR-A05 {
+        description "Users - 10.18.15.x/24";
+        vlan-id 15;
+        l3-interface vlan.15;
+    }
+    USPAR-A06 {
+        description "Users 10.18.16.x/24";
+        vlan-id 16;
+        l3-interface vlan.16;
+    }
+    USPAR-A07 {
+        description "Users 10.18.17.x/24";
+        vlan-id 17;
+        l3-interface vlan.17;
+    }
+    USPAR-Aruba {
+        vlan-id 93;
+        l3-interface vlan.93;
+    }
+    USPAR-Avaya-Infrastructure-Network {
+        description "Avaya Servers";
+---(more 93%)---                                                vlan-id 170;
+        l3-interface vlan.170;
+    }
+    USPAR-DRAC-240 {
+        description "DRACs for  220 servers";
+        vlan-id 240;
+        l3-interface vlan.240;
+    }
+    USPAR-FWJ {
+        description "Firewall Uplink 10.18.4.x/28";
+        vlan-id 4;
+        l3-interface vlan.4;
+    }
+    USPAR-Facilities {
+        description "Biomet Facilities VLAN";
+        vlan-id 195;
+        l3-interface vlan.195;
+    }
+    USPAR-GUEST;
+    USPAR-Guest {
+        description USPAR-Guest;
+        vlan-id 105;
+        interface {
+---(more 94%)---                                                    ge-1/0/0.0;
+        }
+        l3-interface vlan.105;
+    }
+    USPAR-MPLS {
+        description "ATT MPLS 10.18.1.1/28";
+        vlan-id 111;
+        l3-interface vlan.111;
+    }
+    USPAR-Management {
+        description "Switch Management  ";
+        vlan-id 254;
+        interface {
+            ge-0/0/23.0;
+        }
+        l3-interface vlan.254;
+    }
+    USPAR-PXE {
+        description "PXE - 10.18.90.x/24";
+        vlan-id 90;
+        l3-interface vlan.90;
+    }
+    USPAR-Phone {
+---(more 96%)---                                                description "PBX Interconnects";
+        vlan-id 160;
+        l3-interface vlan.160;
+    }
+    USPAR-Printer-Management {
+        description "Secure Print Management";
+        vlan-id 56;
+        l3-interface vlan.56;
+    }
+    USPAR-Servers {
+        description "Servers 220 Subnet";
+        vlan-id 220;
+        l3-interface vlan.220;
+    }
+    USPAR-bmt-hndscn {
+        description USPAR-bmt-hndscn;
+        vlan-id 211;
+        l3-interface vlan.211;
+    }
+    USPAR-bmt-mobile {
+        description USPAR-bmt-mobile;
+        vlan-id 72;
+        l3-interface vlan.72;
+---(more 98%)---                                            }
+    USPAR-bmt-shpflr {
+        description USPAR-bmt-shpflr;
+        vlan-id 216;
+        l3-interface vlan.216;
+    }
+    USPAR-bmt-wifi {
+        description USPAR-bmt-wifi;
+        vlan-id 212;
+        l3-interface vlan.212;
+    }
+    USPAR-hhscnr;
+    default {
+        vlan-id 1;
+        l3-interface vlan.0;
+    }
+    vlans;
+}
+poe {
+    interface all;
+    interface ge-0/0/4 {
+        priority high;
+    }
+---(more 99%)---                                        }
+virtual-chassis {
+    no-split-detection;
+}
+
+{master:1}
+newco@USPAR-SWJ-P01> 
